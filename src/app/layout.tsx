@@ -5,8 +5,8 @@ import { Header } from "./components";
 import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata: Metadata = {
-  title: "Next.js on Firebase App Hosting",
-  description: "",
+  title: "모바일 게임 시세 확인",
+  description: "실시간 모바일 게임 서버별 게임머니 시세를 확인하고 비교하세요",
 };
 
 export default function RootLayout({

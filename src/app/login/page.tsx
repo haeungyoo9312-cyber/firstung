@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import LoginForm from '@/components/auth/LoginForm';
 
 export const metadata: Metadata = {
-  title: '로그인 - Firebase App Hosting',
-  description: '로그인하여 서비스를 이용하세요.',
+  title: '로그인 - 모바일 게임 시세 확인',
+  description: '로그인하여 게임 시세를 확인하세요.',
 };
 
 export default function LoginPage() {
