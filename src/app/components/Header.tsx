@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { Arrow } from "./Arrow";
 import { Firebase } from "./Firebase";
+import UserMenu from "@/components/auth/UserMenu";
 
 export function Header() {
   const pathname = usePathname();
@@ -18,7 +19,12 @@ export function Header() {
       )}
 
       <header className="header">
-        <Firebase />
+        <div className="header-left">
+          <Firebase />
+        </div>
+        <div className="header-right">
+          <UserMenu />
+        </div>
       </header>
     </>
   );
