@@ -285,7 +285,7 @@ export async function updateUserActivity(
 
     switch (activityType) {
       case 'login':
-        updates['basicInfo.lastLoginDate'] = new Date().toISOString();
+        // 로그인 횟수만 증가, lastLoginDate는 별도로 관리하여 무한 루프 방지
         updates['activity.totalLogins'] = increment(1);
         break;
         

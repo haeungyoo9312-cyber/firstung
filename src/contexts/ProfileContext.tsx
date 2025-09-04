@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { 
   UserProfile, 
@@ -204,8 +204,8 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
     }
   };
 
-  // 활동 기록
-  const recordActivity = async (
+  // 활동 기록 (useCallback으로 메모이제이션)
+  const recordActivity = useCallback(async (
     type: 'login' | 'gameView' | 'search', 
     data?: string
   ) => {
@@ -214,15 +214,15 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
     try {
       await updateUserActivity(user.uid, type, data);
       
-      // 로그인 활동인 경우 프로필 새로고침
-      if (type === 'login') {
-        await refreshProfile();
-      }
+      // 로그인 활동인 경우에는 프로필 새로고침하지 않음 (무한 루프 방지)
+      // if (type === 'login') {
+      //   await refreshProfile();
+      // }
     } catch (error) {
       console.error('활동 기록 실패:', error);
       // 활동 기록 실패는 중요하지 않으므로 에러를 던지지 않음
     }
-  };
+  }, [user?.uid]);
 
   // 사용자 변경 시 프로필 로드
   useEffect(() => {
@@ -234,12 +234,19 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
     }
   }, [user?.uid]);
 
-  // 로그인 시 활동 기록
+  // 로그인 시 활동 기록 (한 번만 실행되도록 수정)
   useEffect(() => {
-    if (user?.uid && profile) {
-      recordActivity('login');
+    if (user?.uid && profile && !isLoading) {
+      // 세션당 한 번만 기록되도록 sessionStorage 사용
+      const sessionKey = `login_recorded_${user.uid}`;
+      const isAlreadyRecorded = sessionStorage.getItem(sessionKey);
+      
+      if (!isAlreadyRecorded) {
+        recordActivity('login');
+        sessionStorage.setItem(sessionKey, 'true');
+      }
     }
-  }, [user?.uid, profile?.userId, recordActivity]);
+  }, [user?.uid, profile?.userId, isLoading, recordActivity]);
 
   const value: ProfileContextType = {
     // 상태
