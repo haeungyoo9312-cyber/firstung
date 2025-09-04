@@ -96,8 +96,6 @@ export interface FavoriteGameAction {
   gameId?: string;
 }
 
-// 알림 설정 업데이트용 타입
-export type NotificationSettingsUpdate = Partial<NotificationSettings>;
 
 // 프로필 초기화용 기본값
 export const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {

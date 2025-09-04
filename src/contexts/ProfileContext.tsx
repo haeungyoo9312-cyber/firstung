@@ -239,7 +239,7 @@ export function ProfileProvider({ children }: ProfileProviderProps) {
     if (user?.uid && profile) {
       recordActivity('login');
     }
-  }, [user?.uid, profile?.userId]);
+  }, [user?.uid, profile?.userId, recordActivity]);
 
   const value: ProfileContextType = {
     // 상태
