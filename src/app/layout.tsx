@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Header } from "./components";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ProfileProvider } from "@/contexts/ProfileContext";
 
 export const metadata: Metadata = {
   title: "모바일 게임 시세 확인",
@@ -23,10 +24,12 @@ export default function RootLayout({
       </head>
       <body>
         <AuthProvider>
-          <div className="dots" />
-          <Header />
-          {children}
-          <div className="bottom-gradient" />
+          <ProfileProvider>
+            <div className="dots" />
+            <Header />
+            {children}
+            <div className="bottom-gradient" />
+          </ProfileProvider>
         </AuthProvider>
       </body>
     </html>

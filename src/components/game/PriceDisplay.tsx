@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { GameServer } from '@/types/game';
 import PriceChart from '@/components/chart/PriceChart';
 
@@ -18,6 +19,7 @@ export default function PriceDisplay({
   selectedServer, 
   onServerSelect 
 }: PriceDisplayProps) {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const formatPrice = (price: number) => {
     return price.toLocaleString('ko-KR');
   };
@@ -41,45 +43,75 @@ export default function PriceDisplay({
   };
 
   const selectedServerData = servers.find(server => server.id === selectedServer);
+  
+  const handleServerSelect = (serverId: string) => {
+    onServerSelect(serverId);
+    setIsDropdownOpen(false);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const getDisplayServerName = () => {
+    if (selectedServer && selectedServerData) {
+      return selectedServerData.name;
+    }
+    return '서버 전체';
+  };
 
   return (
     <div className="price-display">
       <div className="price-header">
         <h2 className="price-title">
           <span className="price-game-icon">{gameIcon}</span>
-          {gameName} 
-          {selectedServer ? ` - ${selectedServerData?.name} 서버` : ' 서버 선택'}
+          {gameName} 시세
         </h2>
-        <p className="price-subtitle">
-          {selectedServer ? '1만원당 게임머니 환산' : '시세를 확인할 서버를 선택하세요'}
-        </p>
+        <p className="price-subtitle">1만원당 게임머니 환산</p>
       </div>
 
-      {!selectedServer ? (
-        // 서버 선택 단계
-        <div className="server-selection">
-          <h3 className="server-selection-title">서버 선택</h3>
-          <div className="server-buttons">
-            {servers.map((server) => (
+      {/* 서버 드롭다운 선택 */}
+      <div className="server-dropdown-container">
+        <div className="server-dropdown">
+          <button 
+            className={`dropdown-toggle ${isDropdownOpen ? 'open' : ''}`}
+            onClick={toggleDropdown}
+          >
+            <span className="dropdown-label">{getDisplayServerName()}</span>
+            <span className={`dropdown-arrow ${isDropdownOpen ? 'up' : 'down'}`}>
+              {isDropdownOpen ? '▲' : '▼'}
+            </span>
+          </button>
+          
+          {isDropdownOpen && (
+            <div className="dropdown-menu">
               <button
-                key={server.id}
-                className="server-button"
-                onClick={() => onServerSelect(server.id)}
+                className={`dropdown-item ${!selectedServer ? 'active' : ''}`}
+                onClick={() => handleServerSelect('')}
               >
-                <span className="server-button-name">{server.name}</span>
-                <span className="server-button-info">
-                  최저 {formatPrice(server.lowestPrice)} {server.currency}
-                </span>
+                서버 전체
               </button>
-            ))}
-          </div>
+              {servers.map((server) => (
+                <button
+                  key={server.id}
+                  className={`dropdown-item ${selectedServer === server.id ? 'active' : ''}`}
+                  onClick={() => handleServerSelect(server.id)}
+                >
+                  {server.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-      ) : selectedServerData ? (
+      </div>
+
+      {/* 시세 표시 영역 */}
+      {selectedServer && selectedServerData ? (
         // 선택된 서버의 시세 표시
         <div className="server-details">
           <div className="server-info-card">
             <div className="server-card-header">
-              <h3 className="server-name">{selectedServerData.name}</h3>
+              <h3 className="server-name">{selectedServerData.name} 서버</h3>
               <div className={`trend ${getTrendClass(selectedServerData.trend)}`}>
                 {getTrendIcon(selectedServerData.trend)}
               </div>
@@ -108,19 +140,44 @@ export default function PriceDisplay({
             </div>
           </div>
 
-          <div className="server-actions">
-            <button 
-              className="back-button"
-              onClick={() => onServerSelect('')}
-            >
-              ← 다른 서버 선택
-            </button>
-          </div>
-
           <PriceChart 
             servers={[selectedServerData]} 
             selectedServerId={selectedServer}
           />
+        </div>
+      ) : !selectedServer ? (
+        // 서버 전체 선택 시 모든 서버 시세 표시
+        <div className="all-servers-overview">
+          <h3 className="overview-title">전체 서버 시세 현황</h3>
+          <div className="servers-grid">
+            {servers.map((server) => (
+              <div key={server.id} className="server-overview-card">
+                <div className="server-overview-header">
+                  <h4 className="server-overview-name">{server.name}</h4>
+                  <div className={`trend ${getTrendClass(server.trend)}`}>
+                    {getTrendIcon(server.trend)}
+                  </div>
+                </div>
+                <div className="server-overview-prices">
+                  <div className="price-item">
+                    <span className="price-label">최저</span>
+                    <span className="price-value lowest">
+                      {formatPrice(server.lowestPrice)}
+                    </span>
+                  </div>
+                  <div className="price-item">
+                    <span className="price-label">평균</span>
+                    <span className="price-value average">
+                      {formatPrice(server.averagePrice)}
+                    </span>
+                  </div>
+                </div>
+                <div className="server-overview-currency">
+                  단위: {server.currency}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ) : null}
 

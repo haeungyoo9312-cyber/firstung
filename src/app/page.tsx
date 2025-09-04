@@ -1,6 +1,11 @@
+'use client';
+
 import Link from "next/link";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Home() {
+  const { user } = useAuth();
+
   return (
     <main className="content">
       <section className="hero-section">
@@ -12,9 +17,11 @@ export default function Home() {
           <Link href="/dashboard" className="cta-button primary">
             시세 확인하기
           </Link>
-          <Link href="/login" className="cta-button secondary">
-            로그인
-          </Link>
+          {!user && (
+            <Link href="/login" className="cta-button secondary">
+              로그인
+            </Link>
+          )}
         </div>
       </section>
 

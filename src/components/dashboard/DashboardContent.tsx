@@ -10,7 +10,7 @@ import { gameData } from '@/data/gameData';
 export default function DashboardContent() {
   const { user } = useAuth();
   const [selectedGame, setSelectedGame] = useState('lineage');
-  const [selectedServer, setSelectedServer] = useState<string>('');
+  const [selectedServer, setSelectedServer] = useState<string>(''); // 기본값: 서버 전체
 
   const games = Object.values(gameData).map(game => ({
     id: game.id,
